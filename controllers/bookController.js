@@ -1,7 +1,8 @@
 const { Book } = require("../models"); // This line changed
 const multer = require("multer");
 const path = require("path");
-
+const fs = require("fs");
+const { deletefilewithfoldername } = require("../utils/utils");
 // Configure multer for file upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -14,17 +15,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  // fileFilter: (req, file, cb) => {
-  //   const allowedTypes = /jpeg|jpg|png/;
-  //   const extname = allowedTypes.test(
-  //     path.extname(file.originalname).toLowerCase()
-  //   );
-  //   const mimetype = allowedTypes.test(file.mimetype);
-  //   if (extname && mimetype) {
-  //     return cb(null, true);
-  //   }
-  //   cb(new Error("Only jpeg, jpg, and png files are allowed!"));
-  // },
 }).single("image");
 
 const bookController = {
@@ -33,6 +23,7 @@ const bookController = {
     try {
       upload(req, res, async (err) => {
         if (err) {
+          await deletefilewithfoldername(req.file, "books");
           return res.status(400).json({ error: err.message });
         }
 
@@ -48,7 +39,45 @@ const bookController = {
       res.status(500).json({ error: error.message });
     }
   },
+  update: async (req, res) => {
+    try {
+      upload(req, res, async (err) => {
+        if (err) {
+          await deletefilewithfoldername(req.file, "books");
+          return res.status(400).json({ error: err.message });
+        }
 
+        const book = await Book.findByPk(req.params.id);
+        if (!book) {
+          await deletefilewithfoldername(req.file, "books");
+          return res.status(404).json({ error: "Book not found" });
+        }
+
+        const updateData = {
+          ...req.body,
+          image: req.file ? req.file.filename : book.image,
+        };
+
+        const oldFilePath = book.image;
+
+        await book.update(updateData);
+
+        if (req.file && oldFilePath) {
+          try {
+            const coverPath = path.join("uploads/books/", oldFilePath);
+            if (fs.existsSync(coverPath)) {
+              fs.unlinkSync(coverPath);
+            }
+          } catch (error) {
+            console.error("Error deleting old book image:", error);
+          }
+        }
+        res.status(201).json(book);
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
   // Get all books
   getAll: async (req, res) => {
     try {
@@ -106,30 +135,6 @@ const bookController = {
   },
 
   // Update book
-  update: async (req, res) => {
-    try {
-      upload(req, res, async (err) => {
-        if (err) {
-          return res.status(400).json({ error: err.message });
-        }
-
-        const book = await Book.findByPk(req.params.id);
-        if (!book) {
-          return res.status(404).json({ error: "Book not found" });
-        }
-
-        const updateData = {
-          ...req.body,
-          image: req.file ? req.file.filename : book.image,
-        };
-
-        await book.update(updateData);
-        res.json(book);
-      });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
 
   // Move to trash
   moveToTrash: async (req, res) => {

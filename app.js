@@ -10,6 +10,10 @@ const app = express();
 const journalRoutes = require("./routes/journalRoutes");
 const bookRoutes = require("./routes/bookRoutes");
 const storyRoutes = require("./routes/trendingStoryRoutes");
+const teamRoutes = require("./routes/teamRoutes");
+const contactUsRoutes = require("./routes/contactUsRoutes");
+const bookPublishRoutes = require("./routes/bookPublishRoutes");
+
 const { auth } = require("./middleware/authMiddleware");
 
 // const { sequelize } = require("./models");
@@ -32,6 +36,9 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/journals", journalRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/stories", storyRoutes);
+app.use("/api/teams", teamRoutes);
+app.use("/api/contactUs", contactUsRoutes);
+app.use("/api/bookPublish", bookPublishRoutes);
 
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {

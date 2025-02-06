@@ -2,6 +2,8 @@ const db = require("../models");
 const Journal = db.Journal;
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
+const { deletefilewithfoldername } = require("../utils/utils");
 
 // Configure multer for file upload
 const storage = multer.diskStorage({
@@ -23,6 +25,7 @@ const journalController = {
     try {
       upload(req, res, async (err) => {
         if (err) {
+          await deletefilewithfoldername(req.file, "journal");
           return res.status(400).json({ error: err.message });
         }
 
@@ -66,11 +69,13 @@ const journalController = {
     try {
       upload(req, res, async (err) => {
         if (err) {
+          await deletefilewithfoldername(req.file, "journal");
           return res.status(400).json({ error: err.message });
         }
 
         const journal = await Journal.findByPk(req.params.id);
         if (!journal) {
+          await deletefilewithfoldername(req.file, "journal");
           return res.status(404).json({ error: "Journal not found" });
         }
 
@@ -78,8 +83,21 @@ const journalController = {
           ...req.body,
           image: req.file ? req.file.filename : journal.image,
         };
+        const oldFilePath = journal.image;
 
         await journal.update(updateData);
+
+        if (req.file && oldFilePath) {
+          try {
+            console.log(oldFilePath);
+            const coverPath = path.join("uploads/journal/", oldFilePath);
+            if (fs.existsSync(coverPath)) {
+              fs.unlinkSync(coverPath);
+            }
+          } catch (error) {
+            console.error("Error deleting old journal image:", error);
+          }
+        }
         res.json(journal);
       });
     } catch (error) {

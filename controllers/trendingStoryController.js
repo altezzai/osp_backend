@@ -1,7 +1,8 @@
 const { TrendingStory } = require("../models");
 const multer = require("multer");
 const path = require("path");
-
+const fs = require("fs");
+const { deletefilewithfoldername } = require("../utils/utils");
 // Configure multer for file upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -14,17 +15,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  //   fileFilter: (req, file, cb) => {
-  //     const allowedTypes = /jpeg|jpg|png/;
-  //     const extname = allowedTypes.test(
-  //       path.extname(file.originalname).toLowerCase()
-  //     );
-  //     const mimetype = allowedTypes.test(file.mimetype);
-  //     if (extname && mimetype) {
-  //       return cb(null, true);
-  //     }
-  //     cb(new Error("Only jpeg, jpg, and png files are allowed!"));
-  //   },
 }).single("image");
 
 const trendingStoryController = {
@@ -33,6 +23,7 @@ const trendingStoryController = {
     try {
       upload(req, res, async (err) => {
         if (err) {
+          await deletefilewithfoldername(req.file, "stories");
           return res.status(400).json({ error: err.message });
         }
 
@@ -117,11 +108,13 @@ const trendingStoryController = {
     try {
       upload(req, res, async (err) => {
         if (err) {
+          await deletefilewithfoldername(req.file, "stories");
           return res.status(400).json({ error: err.message });
         }
 
         const story = await TrendingStory.findByPk(req.params.id);
         if (!story) {
+          await deletefilewithfoldername(req.file, "stories");
           return res.status(404).json({ error: "Story not found" });
         }
 
@@ -129,9 +122,21 @@ const trendingStoryController = {
           ...req.body,
           image: req.file ? req.file.filename : story.image,
         };
+        const oldFilePath = story.image;
 
         await story.update(updateData);
-        res.json(story);
+
+        if (req.file && oldFilePath) {
+          try {
+            const coverPath = path.join("uploads/stories/", oldFilePath);
+            if (fs.existsSync(coverPath)) {
+              fs.unlinkSync(coverPath);
+            }
+          } catch (error) {
+            console.error("Error deleting old stories image:", error);
+          }
+        }
+        res.status(200).json(story);
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
