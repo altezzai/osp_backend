@@ -43,14 +43,25 @@ const teamController = {
   // Get all active team members
   getAll: async (req, res) => {
     try {
-      const teams = await Team.findAll({
-        where: {
-          trash: false,
-          status: "active",
-        },
-        order: [["name", "ASC"]],
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: teams } = await Team.findAndCountAll({
+        offset,
+        distinct: true,
+        limit,
+        where: { trash: false },
+        order: [["createdAt", "DESC"]],
       });
-      res.json(teams);
+      const totalPages = Math.ceil(count / limit);
+
+      res.status(200).json({
+        totalContent: count,
+        totalPages,
+        currentPage: page,
+        data: teams,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

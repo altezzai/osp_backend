@@ -44,10 +44,28 @@ const journalController = {
 
   getAll: async (req, res) => {
     try {
-      const journals = await Journal.findAll({
+      // const journals = await Journal.findAll({
+      //   where: { trash: false },
+      // });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: journals } = await Journal.findAndCountAll({
+        offset,
+        distinct: true,
+        limit,
         where: { trash: false },
+        order: [["createdAt", "DESC"]],
       });
-      res.json(journals);
+      const totalPages = Math.ceil(count / limit);
+
+      res.status(200).json({
+        totalContent: count,
+        totalPages,
+        currentPage: page,
+        data: journals,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

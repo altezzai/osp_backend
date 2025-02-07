@@ -33,8 +33,26 @@ const bookPublishController = {
 
   getAll: async (req, res) => {
     try {
-      const books = await BookPublish.findAll({ where: { trash: false } });
-      res.json(books);
+      // const books = await BookPublish.findAll({ where: { trash: false } });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: books } = await BookPublish.findAndCountAll({
+        offset,
+        distinct: true,
+        limit,
+        where: { trash: false },
+        order: [["createdAt", "DESC"]],
+      });
+
+      const totalPages = Math.ceil(count / limit);
+      res.status(200).json({
+        totalContent: count,
+        totalPages,
+        currentPage: page,
+        data: books,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -47,14 +47,33 @@ const trendingStoryController = {
   // Get all active stories
   getAll: async (req, res) => {
     try {
-      const stories = await TrendingStory.findAll({
-        where: {
-          trash: false,
-          status: "active",
-        },
+      // const stories = await TrendingStory.findAll({
+      //   where: {
+      //     trash: false,
+      //     status: "active",
+      //   },
+      //   order: [["date", "DESC"]],
+      // });
+      // res.json(stories);
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: stories } = await TrendingStory.findAndCountAll({
+        offset,
+        distinct: true,
+        limit,
+        where: { trash: false },
         order: [["date", "DESC"]],
       });
-      res.json(stories);
+      const totalPages = Math.ceil(count / limit);
+
+      res.status(200).json({
+        totalContent: count,
+        totalPages,
+        currentPage: page,
+        data: stories,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

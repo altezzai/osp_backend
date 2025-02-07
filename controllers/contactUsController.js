@@ -17,8 +17,27 @@ const contactUsController = {
 
   getAll: async (req, res) => {
     try {
-      const contacts = await ContactUs.findAll({ where: { trash: false } });
-      res.json(contacts);
+      // const contacts = await ContactUs.findAll({ where: { trash: false } });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: contacts } = await ContactUs.findAndCountAll({
+        offset,
+        distinct: true,
+        limit,
+        where: { trash: false },
+        order: [["createdAt", "DESC"]],
+      });
+
+      const totalPages = Math.ceil(count / limit);
+
+      res.status(200).json({
+        totalContent: count,
+        totalPages,
+        currentPage: page,
+        data: contacts,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

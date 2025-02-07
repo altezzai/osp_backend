@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const { deletefilewithfoldername } = require("../utils/utils");
+const book_publish = require("../models/book_publish");
 // Configure multer for file upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -81,11 +82,26 @@ const bookController = {
   // Get all books
   getAll: async (req, res) => {
     try {
-      const books = await Book.findAll({
+      // const books = await Book.findAll({
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: books } = await Book.findAndCountAll({
+        offset,
+        distinct: true,
+        limit,
         where: { trash: false },
         order: [["createdAt", "DESC"]],
       });
-      res.json(books);
+      const totalPages = Math.ceil(count / limit);
+
+      res.status(200).json({
+        totalContent: count,
+        totalPages,
+        currentPage: page,
+        data: books,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
