@@ -34,6 +34,7 @@ module.exports = (sequelize) => {
     status: {
       type: DataTypes.ENUM("active", "inactive"),
       defaultValue: "active",
+      allowNull: false,
     },
     trash: {
       type: DataTypes.BOOLEAN,

@@ -3,7 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const { deletefilewithfoldername } = require("../utils/utils");
-const book_publish = require("../models/book_publish");
+// const book_publish = require("../models/book_publish");
 // Configure multer for file upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

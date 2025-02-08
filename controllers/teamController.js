@@ -30,6 +30,7 @@ const teamController = {
         const teamData = {
           ...req.body,
           image: req.file ? req.file.filename : null,
+          status: "active",
         };
 
         const team = await Team.create(teamData);

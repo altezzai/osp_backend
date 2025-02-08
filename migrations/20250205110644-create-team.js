@@ -1,5 +1,7 @@
 "use strict";
 
+const { all } = require("../routes/publicRoutes");
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("Teams", {
@@ -33,6 +35,7 @@ module.exports = {
       status: {
         type: Sequelize.ENUM("active", "inactive"),
         defaultValue: "active",
+        allowNull: false,
       },
       trash: {
         type: Sequelize.BOOLEAN,

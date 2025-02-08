@@ -13,6 +13,7 @@ const storyRoutes = require("./routes/trendingStoryRoutes");
 const teamRoutes = require("./routes/teamRoutes");
 const contactUsRoutes = require("./routes/contactUsRoutes");
 const bookPublishRoutes = require("./routes/bookPublishRoutes");
+const publicRoutes = require("./routes/publicRoutes");
 
 const { auth } = require("./middleware/authMiddleware");
 
@@ -39,6 +40,7 @@ app.use("/api/stories", storyRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/contactUs", contactUsRoutes);
 app.use("/api/bookPublish", bookPublishRoutes);
+app.use("/api/public", publicRoutes);
 
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {
