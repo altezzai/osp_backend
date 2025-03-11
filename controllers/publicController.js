@@ -11,24 +11,47 @@ const getBooks = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const categories = req.query.categories || "";
+    const sub_categories = req.query.sub_categories || "";
     const searchQuery = req.query.q || "";
     const types = req.query.type
       ? req.query.type.split(",")
       : ["ruby", "diamond"];
+    whereQuery = { trash: false };
+
+    if (categories) {
+      whereQuery.category = categories;
+    }
+    if (sub_categories) {
+      whereQuery.sub_category = sub_categories;
+    }
+    if (types) {
+      whereQuery.type = types;
+    }
+    if (searchQuery) {
+      whereQuery[Op.or] = [
+        { title: { [Op.like]: `%${searchQuery}%` } },
+        { description: { [Op.like]: `%${searchQuery}%` } },
+        { category: { [Op.like]: `%${searchQuery}%` } },
+        { sub_category: { [Op.like]: `%${searchQuery}%` } },
+      ];
+    }
+
     const { count, rows: books } = await Book.findAndCountAll({
       offset,
       distinct: true,
       limit,
-      where: {
-        trash: false,
-        type: types,
-        [Op.or]: [
-          { title: { [Op.like]: `%${searchQuery}%` } },
-          { description: { [Op.like]: `%${searchQuery}%` } },
-          { category: { [Op.like]: `%${searchQuery}%` } },
-          { sub_category: { [Op.like]: `%${searchQuery}%` } },
-        ],
-      },
+      where: whereQuery,
+      // where: {
+      //   trash: false,
+      //   type: types,
+      //   [Op.or]: [
+      //     { title: { [Op.like]: `%${searchQuery}%` } },
+      //     { description: { [Op.like]: `%${searchQuery}%` } },
+      //     { category: { [Op.like]: `%${searchQuery}%` } },
+      //     { sub_category: { [Op.like]: `%${searchQuery}%` } },
+      //   ],
+      // },
       order: [["createdAt", "DESC"]],
     });
     const totalPages = Math.ceil(count / limit);
@@ -97,12 +120,32 @@ const getStories = async (req, res) => {
         ],
       },
       order: [["createdAt", "DESC"]],
+      attributes: ["id", "title", "description", "image", "type", "date"], // Select specific fields
     });
     const totalPages = Math.ceil(count / limit);
     res.status(200).json({
       totalContent: count,
       totalPages,
       currentPage: page,
+      data: stories,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const getLatest3TrendingStories = async (req, res) => {
+  try {
+    const { rows: stories } = await TrendingStory.findAndCountAll({
+      distinct: true,
+      limit: 3, // Fetch only the latest 3 stories
+      where: {
+        trash: false,
+      },
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "title", "description", "image", "type", "date"], // Select specific fields
+    });
+
+    res.status(200).json({
       data: stories,
     });
   } catch (error) {
@@ -183,7 +226,6 @@ const getcolleges = async (req, res) => {
         ],
       },
       attributes: ["id", "college_name", "logo"],
-      
     });
     res.status(201).json(colleges);
   } catch (error) {
@@ -195,6 +237,7 @@ module.exports = {
   getBooks,
   getJournals,
   getStories,
+  getLatest3TrendingStories,
   getTeams,
 
   getSchoolOf,
