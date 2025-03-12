@@ -1,4 +1,5 @@
 const { ContactUs } = require("../models");
+const { Op } = require("sequelize");
 
 const contactUsController = {
   create: async (req, res) => {

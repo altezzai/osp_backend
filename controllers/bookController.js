@@ -2,6 +2,7 @@ const { Book } = require("../models"); // This line changed
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { Op } = require("sequelize");
 const { deletefilewithfoldername } = require("../utils/utils");
 // const book_publish = require("../models/book_publish");
 // Configure multer for file upload

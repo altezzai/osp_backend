@@ -2,6 +2,8 @@ const { Team } = require("../models");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { Op } = require("sequelize");
+
 const { deletefilewithfoldername } = require("../utils/utils");
 
 // Configure multer for file upload
