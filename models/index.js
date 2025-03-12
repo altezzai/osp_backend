@@ -1,17 +1,8 @@
 const { Sequelize } = require("sequelize");
+const { ospSequelize } = require("../config/connection");
 const config = require("../config/config.json")["development"];
 const fs = require("fs");
 const path = require("path");
-
-const sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  {
-    host: config.host,
-    dialect: config.dialect,
-  }
-);
 
 const db = {};
 
@@ -23,11 +14,11 @@ fs.readdirSync(__dirname)
     );
   })
   .forEach((file) => {
-    const model = require(path.join(__dirname, file))(sequelize);
+    const model = require(path.join(__dirname, file))(ospSequelize);
     db[model.name] = model;
   });
 
-db.sequelize = sequelize;
+db.sequelize = ospSequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
