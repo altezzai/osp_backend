@@ -25,6 +25,13 @@ const upload = multer({
 const journalController = {
   create: async (req, res) => {
     try {
+      const { title, description, category, type } = req.body;
+      if (!title || !description || !category || !type) {
+        return res.status(400).json({
+          error:
+            "All fields are required: title, description, category, and type.",
+        });
+      }
       upload(req, res, async (err) => {
         if (err) {
           await deletefilewithfoldername(req.file, "journal");

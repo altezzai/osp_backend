@@ -43,7 +43,7 @@ module.exports = {
       },
       subject_area: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       title: {
         type: Sequelize.STRING,

@@ -15,21 +15,29 @@ const upload = multer({ storage }).single("file");
 
 const bookPublishController = {
   create: async (req, res) => {
-    upload(req, res, async (err) => {
-      if (err) {
-        await deletefilewithfoldername(req.file, "bookPublish");
-        return res.status(500).json({ error: err.message });
+    try {
+      const { first_name, last_name, email, title, book_type } = req.body;
+      if (!title || !first_name || !last_name || !book_type || !email) {
+        return res.status(400).json({
+          error:
+            "All fields are required: title, first_name, last_name,email and book_type.",
+        });
       }
-      try {
+      upload(req, res, async (err) => {
+        if (err) {
+          await deletefilewithfoldername(req.file, "bookPublish");
+          return res.status(500).json({ error: err.message });
+        }
+
         const book = await BookPublish.create({
           ...req.body,
           file: req.file ? req.file.filename : null,
         });
         res.status(201).json(book);
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
-    });
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   },
 
   getAll: async (req, res) => {
@@ -55,14 +63,6 @@ const bookPublishController = {
         limit,
         where: whereQuery,
         order: [["createdAt", "DESC"]],
-        // attributes: [
-        //   "id",
-        //   "title",
-        //   "description",
-        //   "file",
-        //   "createdAt",
-        //   "updatedAt",
-        // ],
       });
 
       const totalPages = Math.ceil(count / limit);

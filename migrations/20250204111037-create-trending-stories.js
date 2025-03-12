@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("TrendingStories", {
+    await queryInterface.createTable("trendingStories", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -49,12 +49,12 @@ module.exports = {
     });
 
     // Add indexes
-    await queryInterface.addIndex("TrendingStories", ["title"]);
-    await queryInterface.addIndex("TrendingStories", ["type"]);
-    await queryInterface.addIndex("TrendingStories", ["status"]);
+    await queryInterface.addIndex("trendingStories", ["title"]);
+    await queryInterface.addIndex("trendingStories", ["type"]);
+    await queryInterface.addIndex("trendingStories", ["status"]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("TrendingStories");
+    await queryInterface.dropTable("trendingStories");
   },
 };

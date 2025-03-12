@@ -47,7 +47,7 @@ module.exports = (ospSequelize) => {
     {
       modelName: "Book",
       tableName: "books",
-      timestamps: false,
+      timestamps: true,
     }
   );
 

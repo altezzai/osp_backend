@@ -4,6 +4,14 @@ const { Op } = require("sequelize");
 const contactUsController = {
   create: async (req, res) => {
     try {
+      const { first_name, last_name, email } = req.body;
+
+      if (!first_name || !last_name || !email) {
+        return res.status(400).json({
+          error: "All fields are required:  first_name, last_name and email.",
+        });
+      }
+
       if (!req.body.first_name || !req.body.email) {
         return res
           .status(400)

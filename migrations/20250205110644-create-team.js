@@ -4,7 +4,7 @@ const { all } = require("../routes/publicRoutes");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("Teams", {
+    await queryInterface.createTable("teams", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -29,7 +29,7 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         // unique: true,
       },
       status: {
@@ -52,12 +52,12 @@ module.exports = {
     });
 
     // Add indexes
-    await queryInterface.addIndex("Teams", ["name"]);
-    await queryInterface.addIndex("Teams", ["category"]);
-    await queryInterface.addIndex("Teams", ["email"]);
+    await queryInterface.addIndex("teams", ["name"]);
+    await queryInterface.addIndex("teams", ["category"]);
+    await queryInterface.addIndex("teams", ["email"]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("Teams");
+    await queryInterface.dropTable("teams");
   },
 };

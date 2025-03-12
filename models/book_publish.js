@@ -44,7 +44,7 @@ module.exports = (ospSequelize) => {
       },
       subject_area: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       title: {
         type: DataTypes.STRING,
@@ -94,7 +94,7 @@ module.exports = (ospSequelize) => {
     {
       modelName: "BookPublish",
       tableName: "book_publish",
-      timestamps: false,
+      timestamps: true,
     }
   );
 
