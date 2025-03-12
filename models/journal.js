@@ -1,7 +1,9 @@
 const { DataTypes } = require("sequelize");
 
-module.exports = (sequelize) => {
-  const Journal = sequelize.define(
+const { ospSequelize } = require("../config/connection");
+
+module.exports = (ospSequelize) => {
+  const Journal = ospSequelize.define(
     "Journal",
     {
       id: {

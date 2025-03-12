@@ -47,23 +47,28 @@ const trendingStoryController = {
   // Get all active stories
   getAll: async (req, res) => {
     try {
-      // const stories = await TrendingStory.findAll({
-      //   where: {
-      //     trash: false,
-      //     status: "active",
-      //   },
-      //   order: [["date", "DESC"]],
-      // });
-      // res.json(stories);
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const offset = (page - 1) * limit;
+      const searchQuery = req.query.q || "";
+      const types = req.query.type || "";
+      whereQuery = { trash: false };
 
+      if (types) {
+        whereQuery.type = types;
+      }
+      if (searchQuery) {
+        whereQuery[Op.or] = [
+          { title: { [Op.like]: `%${searchQuery}%` } },
+          { description: { [Op.like]: `%${searchQuery}%` } },
+          { type: { [Op.like]: `%${searchQuery}%` } },
+        ];
+      }
       const { count, rows: stories } = await TrendingStory.findAndCountAll({
         offset,
         distinct: true,
         limit,
-        where: { trash: false },
+        where: whereQuery,
         order: [["date", "DESC"]],
       });
       const totalPages = Math.ceil(count / limit);

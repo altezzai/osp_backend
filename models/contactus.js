@@ -1,7 +1,9 @@
 const { DataTypes } = require("sequelize");
 
-module.exports = (sequelize) => {
-  const ContactUs = sequelize.define("ContactUs", {
+const { ospSequelize } = require("../config/connection");
+
+module.exports = (ospSequelize) => {
+  const ContactUs = ospSequelize.define("ContactUs", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

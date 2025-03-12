@@ -44,18 +44,39 @@ const journalController = {
 
   getAll: async (req, res) => {
     try {
-      // const journals = await Journal.findAll({
-      //   where: { trash: false },
-      // });
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const offset = (page - 1) * limit;
+      const categories = req.query.categories || "";
+      const sub_categories = req.query.sub_categories || "";
+      const searchQuery = req.query.q || "";
+      const types = req.query.type
+        ? req.query.type.split(",")
+        : ["ruby", "diamond"];
+      whereQuery = { trash: false };
 
+      if (categories) {
+        whereQuery.category = categories;
+      }
+      if (sub_categories) {
+        whereQuery.sub_category = sub_categories;
+      }
+      if (types) {
+        whereQuery.type = types;
+      }
+      if (searchQuery) {
+        whereQuery[Op.or] = [
+          { title: { [Op.like]: `%${searchQuery}%` } },
+          { description: { [Op.like]: `%${searchQuery}%` } },
+          { category: { [Op.like]: `%${searchQuery}%` } },
+          { sub_category: { [Op.like]: `%${searchQuery}%` } },
+        ];
+      }
       const { count, rows: journals } = await Journal.findAndCountAll({
         offset,
         distinct: true,
         limit,
-        where: { trash: false },
+        where: whereQuery,
         order: [["createdAt", "DESC"]],
       });
       const totalPages = Math.ceil(count / limit);

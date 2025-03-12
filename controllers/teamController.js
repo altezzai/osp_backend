@@ -47,12 +47,26 @@ const teamController = {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const offset = (page - 1) * limit;
+      const categories = req.query.categories || "";
+      const searchQuery = req.query.q || "";
+      whereQuery = { trash: false };
 
+      if (categories) {
+        whereQuery.category = categories;
+      }
+      if (searchQuery) {
+        whereQuery[Op.or] = [
+          { name: { [Op.like]: `%${searchQuery}%` } },
+          { position: { [Op.like]: `%${searchQuery}%` } },
+          { category: { [Op.like]: `%${searchQuery}%` } },
+          { email: { [Op.like]: `%${searchQuery}%` } },
+        ];
+      }
       const { count, rows: teams } = await Team.findAndCountAll({
         offset,
         distinct: true,
         limit,
-        where: { trash: false },
+        where: whereQuery,
         order: [["createdAt", "DESC"]],
       });
       const totalPages = Math.ceil(count / limit);

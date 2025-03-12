@@ -21,12 +21,21 @@ const contactUsController = {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const offset = (page - 1) * limit;
+      const searchQuery = req.query.q || "";
+      whereQuery = { trash: false };
 
+      if (searchQuery) {
+        whereQuery[Op.or] = [
+          { first_name: { [Op.like]: `%${searchQuery}%` } },
+          { last_name: { [Op.like]: `%${searchQuery}%` } },
+          { email: { [Op.like]: `%${searchQuery}%` } },
+        ];
+      }
       const { count, rows: contacts } = await ContactUs.findAndCountAll({
         offset,
         distinct: true,
         limit,
-        where: { trash: false },
+        where: whereQuery,
         order: [["createdAt", "DESC"]],
       });
 

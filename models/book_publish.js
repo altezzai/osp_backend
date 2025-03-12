@@ -1,7 +1,8 @@
 const { DataTypes } = require("sequelize");
+const { ospSequelize } = require("../config/connection");
 
-module.exports = (sequelize) => {
-  const BookPublish = sequelize.define(
+module.exports = (ospSequelize) => {
+  const BookPublish = ospSequelize.define(
     "BookPublish",
     {
       id: {
