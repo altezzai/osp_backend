@@ -16,19 +16,21 @@ const upload = multer({ storage }).single("file");
 const bookPublishController = {
   create: async (req, res) => {
     try {
-      const { first_name, last_name, email, title, book_type } = req.body;
-      if (!title || !first_name || !last_name || !book_type || !email) {
-        return res.status(400).json({
-          error:
-            "All fields are required: title, first_name, last_name,email and book_type.",
-        });
-      }
+      console.log(req.file, "----");
+
       upload(req, res, async (err) => {
         if (err) {
           await deletefilewithfoldername(req.file, "bookPublish");
           return res.status(500).json({ error: err.message });
         }
 
+        const { first_name, last_name, email, title, book_type } = req.body;
+        if (!title || !first_name || !last_name || !book_type || !email) {
+          return res.status(400).json({
+            error:
+              "All fields are required: title, first_name, last_name,email and book_type.",
+          });
+        }
         const book = await BookPublish.create({
           ...req.body,
           file: req.file ? req.file.filename : null,
