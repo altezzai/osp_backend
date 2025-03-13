@@ -23,16 +23,16 @@ const teamController = {
   // Create new team member
   create: async (req, res) => {
     try {
-      const { name, position, category } = req.body;
-      if (!name || !position || !category) {
-        return res.status(400).json({
-          error: "All fields are required: name, position, and category.",
-        });
-      }
       upload(req, res, async (err) => {
         if (err) {
           await deletefilewithfoldername(req.file, "team");
           return res.status(400).json({ error: err.message });
+        }
+        const { name, position, category } = req.body;
+        if (!name || !position || !category) {
+          return res.status(400).json({
+            error: "All fields are required: name, position, and category.",
+          });
         }
 
         const teamData = {

@@ -22,20 +22,17 @@ const trendingStoryController = {
   // Create new story
   create: async (req, res) => {
     try {
-      const { title, description, type } = req.body;
-      if (!title || !description || !type) {
-        return res.status(400).json({
-          error: "All fields are required: title, description, and type.",
-        });
-      }
-
       upload(req, res, async (err) => {
         if (err) {
           await deletefilewithfoldername(req.file, "stories");
           return res.status(400).json({ error: err.message });
         }
-
-        const { title, date } = req.body;
+        const { title, description, type, date } = req.body;
+        if (!title || !description || !type) {
+          return res.status(400).json({
+            error: "All fields are required: title, description and type.",
+          });
+        }
 
         const storyData = {
           ...req.body,

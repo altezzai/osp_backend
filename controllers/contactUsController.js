@@ -11,12 +11,6 @@ const contactUsController = {
           error: "All fields are required:  first_name, last_name and email.",
         });
       }
-
-      if (!req.body.first_name || !req.body.email) {
-        return res
-          .status(400)
-          .json({ error: "First name and email are required" });
-      }
       const contact = await ContactUs.create(req.body);
       res.status(201).json(contact);
     } catch (error) {
