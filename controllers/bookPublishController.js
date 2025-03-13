@@ -106,6 +106,7 @@ const bookPublishController = {
         const updateData = {
           ...req.body,
           file: req.file ? req.file.filename : book.file,
+          user_id: 0,
         };
 
         const oldFilePath = book.file;
