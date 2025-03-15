@@ -53,9 +53,9 @@ module.exports = {
 
     // Add indexes for better query performance
 
-    await queryInterface.addIndex("Books", ["category"]);
-    await queryInterface.addIndex("Books", ["type"]);
-    await queryInterface.addIndex("Books", ["title"]);
+    await queryInterface.addIndex("books", ["category"]);
+    await queryInterface.addIndex("books", ["type"]);
+    await queryInterface.addIndex("books", ["title"]);
   },
 
   down: async (queryInterface, Sequelize) => {
