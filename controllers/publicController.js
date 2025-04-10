@@ -217,7 +217,15 @@ const getcolleges = async (req, res) => {
   const searchQuery = req.query.q || "";
 
   try {
-    const colleges = await College.findAll({
+    // const colleges = await College.findAll({
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const { count, rows: colleges } = await College.findAndCountAll({
+      offset,
+      distinct: true,
+      limit,
       where: {
         trash: 0,
         [Op.or]: [
@@ -230,7 +238,14 @@ const getcolleges = async (req, res) => {
       },
       attributes: ["id", "college_name", "logo"],
     });
-    res.status(201).json(colleges);
+
+    const totalPages = Math.ceil(count / limit);
+    res.status(200).json({
+      totalContent: count,
+      totalPages,
+      currentPage: page,
+      data: colleges,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
