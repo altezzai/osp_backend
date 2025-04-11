@@ -1,6 +1,7 @@
 const { Book, Journal, Team, TrendingStory } = require("../models");
 const College = require("../models/knowledge_models/college");
 const Department = require("../models/knowledge_models/department");
+const SchoolOf = require("../models/knowledge_models/schoolof");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -176,14 +177,9 @@ const getTeams = async (req, res) => {
 
 const getSchoolOf = async (req, res) => {
   try {
-    const uniqueSchools = await Department.findAll({
-      attributes: [
-        [Sequelize.fn("DISTINCT", Sequelize.col("schoolOf")), "schoolOf"],
-      ],
+    const schools = await SchoolOf.findAll({
+      attributes: ["id", "schoolOf"],
     });
-
-    // Map the results to a simple array of unique `schoolOf` values
-    const schools = uniqueSchools.map((school) => school.schoolOf);
 
     res.status(200).json({
       schools,
@@ -203,8 +199,6 @@ const getDepartmentBySchoolof = async (req, res) => {
       attributes: ["id", "department_name", "icon", "schoolOf"],
       order: [["department_name", "ASC"]],
     });
-
-    const departments = departmentslist.map((dept) => dept.department_name);
 
     res.status(200).json({
       departmentslist,

@@ -49,10 +49,7 @@ const startServer = async () => {
     console.log(
       "Connection to knowledge database has been established successfully."
     );
-    // await janewaySequelize.authenticate();
-    // console.log(
-    //   "Connection to repository database has been established successfully."
-    // );
+
     await ospSequelize.authenticate();
     console.log(
       "Connection to osp database has been established successfully."
